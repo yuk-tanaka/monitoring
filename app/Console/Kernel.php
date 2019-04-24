@@ -2,7 +2,8 @@
 
 namespace App\Console;
 
-use App\Console\Commands\Monitor;
+use App\Console\Commands\MonitorAll;
+use App\Console\Commands\NotifyDailyMonitorReport;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -25,7 +26,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-         $schedule->command(Monitor::class)->hourly();
+         $schedule->command(MonitorAll::class)->hourly();
+        $schedule->command(NotifyDailyMonitorReport::class)->dailyAt('23:55');
     }
 
     /**

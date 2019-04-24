@@ -58,10 +58,12 @@ class AccessErrorNotification extends Notification
      */
     public function toSlack($notifiable): SlackMessage
     {
+        $title = '<!channel> ' . $this->accessPoint->name . '(' . $this->accessPoint->url . ')へのアクセスでエラーが発生しました';
+
         return (new SlackMessage())
             ->from(config('monitoring.slack_notification_username'), ':warning:')
             ->to(config('monitoring.slack_channel'))
-            ->content($this->accessPoint->name . 'へのアクセスでエラーが発生しました')
+            ->content($title)
             ->attachment(function (SlackAttachment $attachment) {
                 $attachment->content($this->errorMessage);
             });

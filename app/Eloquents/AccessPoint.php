@@ -3,6 +3,7 @@
 namespace App\Eloquents;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * App\Eloquents\AccessPoint
@@ -29,4 +30,12 @@ class AccessPoint extends Model
         'name',
         'url',
     ];
+
+    /**
+     * @return HasMany
+     */
+    public function errorLogs(): HasMany
+    {
+        return $this->hasMany(ErrorLog::class);
+    }
 }

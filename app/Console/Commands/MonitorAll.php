@@ -6,7 +6,7 @@ use App\Eloquents\AccessPoint;
 use App\Events\Monitoring;
 use Illuminate\Console\Command;
 
-class Monitor extends Command
+class MonitorAll extends Command
 {
     /**
      * @var string
@@ -37,15 +37,6 @@ class Monitor extends Command
      * @return void
      */
     public function handle(): void
-    {
-        $this->monitorAll();
-    }
-
-    /**
-     * 全件モニタリング
-     * まずはこれだけ
-     */
-    private function monitorAll(): void
     {
         foreach ($this->accessPoint->all() as $accessPoint) {
             event(new Monitoring($accessPoint));

@@ -42,34 +42,48 @@ class MonitoringListener implements ShouldQueue
         $error = $this->access($event->accessPoint->url);
 
         if (!is_null($error)) {
+            $this->createErrorLog($event->accessPoint, $error);
             $this->sendErrorNotification($event->accessPoint, $error);
         }
     }
 
     /**
      * @param string $url
-     * @return string|null エラーメッセージ 接続成功ならnull
+     * @return GuzzleException|null 接続成功ならnull
      */
-    private function access(string $url): ?string
+    private function access(string $url): ?GuzzleException
     {
         try {
             $this->guzzleClient->request('GET', $url);
             return null;
 
         } catch (GuzzleException $e) {
-            $message = 'status:' . $e->getCode() . PHP_EOL . $e->getMessage();
-            return $message;
+            return $e;
         }
     }
 
     /**
      * @param AccessPoint $accessPoint
-     * @param string $error
+     * @param GuzzleException $error
      */
-    private function sendErrorNotification(AccessPoint $accessPoint, string $error): void
+    private function sendErrorNotification(AccessPoint $accessPoint, GuzzleException $error): void
     {
         $accessNotifications = $this->accessNotification->all();
 
-        Notification::send($accessNotifications, new AccessErrorNotification($accessPoint, $error));
+        $message = 'status:' . $error->getCode() . PHP_EOL . $error->getMessage();
+
+        Notification::send($accessNotifications, new AccessErrorNotification($accessPoint, $message));
+    }
+
+    /**
+     * @param AccessPoint $accessPoint
+     * @param GuzzleException $error
+     */
+    private function createErrorLog(AccessPoint $accessPoint, GuzzleException $error): void
+    {
+        $accessPoint->errorLogs()->create([
+            'status' => $error->getCode(),
+            'description' => $error->getMessage(),
+        ]);
     }
 }
